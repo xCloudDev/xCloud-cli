@@ -22,6 +22,16 @@ npm install -g github:xCloudDev/xCloud-cli
 xcloud --help
 ```
 
+For AI agent mode, install xCloud Terminal instead or alongside this package:
+
+```bash
+npm install -g github:xCloudDev/xcloud-terminal
+xcloud --ai
+xterm --ai --agent hosted
+```
+
+`xcloud --ai` opens xCloud Terminal's local agent mode. `--agent hosted` loads portable skills from https://github.com/xCloudDev/xcloud-agent-skills and uses the user's Anthropic/OpenAI/OpenRouter token.
+
 For contributors developing locally:
 
 ```bash
@@ -84,6 +94,8 @@ Tokens are saved in the config file for human use. Agents and CI should prefer e
 - `--api-flavor public|enterprise`
 - `--output table|json|yaml`
 - `--yes` for non-interactive write/destructive operations
+- `--ai` to delegate into xCloud Terminal agent mode when `@xcloud/terminal` is installed
+- `--agent local|hosted` to select local xCloud AI/tool mode or hosted skills mode
 
 ## Agent and DevOps usage pattern
 
