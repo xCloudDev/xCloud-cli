@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { loadConfig, saveProfile, redact } from '../lib/config.js';
-import { buildURL, resolveRoute } from '../lib/routes.js';
+import { buildRoutePath, buildURL, resolveRoute } from '../lib/routes.js';
 import { requestJSON } from '../lib/http.js';
 import { confirmDangerous } from '../lib/confirm.js';
 import { format, errorPayload } from '../lib/output.js';
@@ -36,9 +36,9 @@ Usage:
   xcloud --ai [--agent local|hosted] [prompt]
   xcloud [global flags] health
   xcloud [global flags] configure --base-url URL --token TOKEN [--api-flavor public|enterprise]
-  xcloud [global flags] api get|post|patch|delete <path> [--data JSON] [--query k=v]
-  xcloud [global flags] servers list|show|sites|databases|cron-jobs|monitoring|tasks|php-versions|sudo-users|power-cycle [uuid]
-  xcloud [global flags] sites list|show|backups|status|ssl|domain|events|deployment-logs|git|ssh|backup|purge-cache [uuid]
+  xcloud [global flags] api get|post|put|patch|delete <path> [--data JSON] [--query k=v]
+  xcloud [global flags] servers list|show|sites|databases|cron-jobs|monitoring|tasks|php-versions|sudo-users|create-sudo-user|delete-sudo-user|create-wordpress-site|power-cycle [uuid]
+  xcloud [global flags] sites list|show|backups|status|ssl|domain|monitoring|events|deployment-logs|git|ssh|update-ssh|backup|purge-cache [uuid]
   xcloud [global flags] enterprise servers|users|addon ...
 
 AI mode:
@@ -84,8 +84,8 @@ async function run(argv = process.argv.slice(2)) {
   if (args[0] === 'api') {
     method = String(args[1] || '').toUpperCase();
     path = args[2];
-    if (!['GET', 'POST', 'PATCH', 'DELETE'].includes(method) || !path) throw new Error('api usage: xcloud api get|post|patch|delete <path>');
-    dangerous = ['POST', 'PATCH', 'DELETE'].includes(method);
+    if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method) || !path) throw new Error('api usage: xcloud api get|post|put|patch|delete <path>');
+    dangerous = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
   } else if (args[0] === 'health') {
     [method, path] = ['GET', '/health'];
   } else {
@@ -95,13 +95,7 @@ async function run(argv = process.argv.slice(2)) {
     const { route, params, key } = resolved;
     cfg.apiFlavor = flavor;
     method = route[0];
-    if (typeof route[1] === 'function') {
-      if (!params[0]) throw new Error(`missing required id for command: ${key}`);
-      path = route[1](params[0]);
-    } else {
-      if (params.length) throw new Error(`unexpected argument(s) for command: ${key}`);
-      path = route[1];
-    }
+    path = buildRoutePath(route, params, key);
     dangerous = Boolean(route[2]);
   }
 
