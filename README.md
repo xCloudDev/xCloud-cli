@@ -134,6 +134,7 @@ xcloud health
 xcloud user show
 xcloud user tokens
 xcloud user revoke-token <token-id> --yes
+xcloud integrations cloudflare
 xcloud blueprints list
 
 xcloud servers list
@@ -145,6 +146,9 @@ xcloud servers monitoring <server-uuid>
 xcloud servers tasks <server-uuid>
 xcloud servers php-versions <server-uuid>
 xcloud servers sudo-users <server-uuid>
+xcloud servers create-sudo-user <server-uuid> --data '{"username":"deploy"}' --yes
+xcloud servers delete-sudo-user <server-uuid> <sudo-user-uuid> --yes
+xcloud servers create-wordpress-site <server-uuid> --data '{"domain":"example.com"}' --yes
 xcloud servers power-cycle <server-uuid> --yes
 
 xcloud sites list
@@ -153,10 +157,12 @@ xcloud sites backups <site-uuid>
 xcloud sites status <site-uuid>
 xcloud sites ssl <site-uuid>
 xcloud sites domain <site-uuid>
+xcloud sites monitoring <site-uuid>
 xcloud sites events <site-uuid>
 xcloud sites deployment-logs <site-uuid>
 xcloud sites git <site-uuid>
 xcloud sites ssh <site-uuid>
+xcloud sites update-ssh <site-uuid> --data '{"public_key":"ssh-ed25519 ..."}' --yes
 xcloud sites backup <site-uuid> --yes
 xcloud sites purge-cache <site-uuid> --yes
 ```
@@ -176,6 +182,18 @@ xcloud enterprise servers show <server-uuid>
 xcloud enterprise servers create --data '{"name":"Demo"}' --yes
 xcloud enterprise servers update <server-uuid> --data '{"name":"New"}' --yes
 xcloud enterprise servers delete <server-uuid> --yes
+
+xcloud enterprise sites list
+xcloud enterprise sites show <site-uuid>
+xcloud enterprise sites create --data '{"domain":"example.com"}' --yes
+xcloud enterprise sites update <site-uuid> --data '{"domain":"example.org"}' --yes
+xcloud enterprise sites delete <site-uuid> --yes
+xcloud enterprise sites suspend <site-uuid> --yes
+xcloud enterprise sites staging <site-uuid> --yes
+xcloud enterprise sites publish-staging <site-uuid> --yes
+xcloud enterprise sites purge-cache <site-uuid> --yes
+xcloud enterprise sites ssh-keys <site-uuid>
+xcloud enterprise sites create-ssh-key <site-uuid> --data '{"public_key":"ssh-ed25519 ..."}' --yes
 
 xcloud enterprise users list
 xcloud enterprise users show <user-uuid>
@@ -206,6 +224,7 @@ xcloud enterprise addon patchstack delete <site-uuid> --yes
 
 ```bash
 xcloud api get /servers --query page=2 --output json
+xcloud api put /sites/<uuid>/ssh --data '{"public_key":"ssh-ed25519 ..."}' --yes
 xcloud api post /sites/<uuid>/backup --data '{}' --yes
 xcloud --api-flavor enterprise api get /servers --output json
 ```
